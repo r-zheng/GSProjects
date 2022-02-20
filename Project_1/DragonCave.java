@@ -9,21 +9,11 @@ public class DragonCave {
 
         System.out.println("You are in a land full of dragons. In front of you,\nyou see two caves. In one cave, the dragon is friendly\nand will share his treasure with you. The other dragon\nis greedy and hungry and will eat you on sight.\nWhich cave will you go into? (1 or 2)\n");
 
-        Integer choice = null;
-        try {
-            choice = input.nextInt();
-        } catch(InputMismatchException e) {
-            System.out.println("Not a valid choice");
-            input.next();
-        }
-        while(choice == null || choice != 1 && choice != 2) {
+        int choice = getIntegerFromInput(input);
+
+        while(choice != 1 && choice != 2) {
             System.out.println("Choose 1 or 2:");
-            try {
-                choice = input.nextInt();
-            } catch(InputMismatchException e){
-                System.out.println("Not a valid choice");
-                input.next();
-            }
+            choice = getIntegerFromInput(input);
         }
 
         if(choice == 1) {
@@ -35,5 +25,16 @@ public class DragonCave {
         }
 
         input.close();
+    }
+
+    public static int getIntegerFromInput(Scanner input) {
+        while(true) {
+            try {
+                return input.nextInt();
+            } catch (InputMismatchException e) {
+                System.out.println("Not a valid choice");
+                input.next();
+            }
+        }
     }
 }
