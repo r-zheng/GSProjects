@@ -1,6 +1,6 @@
 package genspark.projects.HangmanFunctional;
 
-import java.io.*;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
@@ -15,10 +15,14 @@ public class HangmanGame {
 
     private int score;
     private String name;
-    private String scoreFile;
 
-    public HangmanGame(String name, String scoreFile) throws IOException {
-        this.scoreFile = scoreFile;
+    private String word;
+
+    public static HangmanGame game;
+    public static final String dictionaryName = "./HangmanFunctional/RandomWords.txt";
+    public static final String scoreFile = "./HangmanFunctional/Scores.txt";
+
+    public HangmanGame(String name) throws IOException {
         score = 0;
         this.name = name;
 
@@ -32,7 +36,6 @@ public class HangmanGame {
     }
 
     public void newGame(String dictionaryName) throws IOException {
-        String word;
         try {
             word = getRandomWord(dictionaryName);
         } catch (IOException e) {
@@ -81,20 +84,20 @@ public class HangmanGame {
         return numberCorrect[0];
     }
 
-    private void printHangman() {
-        System.out.println(hangmenImage.get(remainingWrongGuesses));
-    }
-
-    private void printGuesses() {
+    public String hiddenWord() {
+        StringBuilder hidden = new StringBuilder();
         letters.stream().forEach(letter -> {
             if (letter.isRevealed())
-                System.out.print(letter.getLetter());
+                hidden.append(letter.getLetter());
             else
-                System.out.print("_");
-            System.out.print(" ");
+                hidden.append('_');
+            hidden.append(' ');
         });
+        return hidden.toString();
+    }
 
-        System.out.printf("\nYou have %d wrong guesses remaining     You have guessed: %s%nYour score: %d\n", remainingWrongGuesses, guessedLetters.toString(), score);
+    public String scoreKeeping() {
+        return String.format("<html>You have %d wrong guesses remaining<br/>You have guessed: %s<br/>Your score: %d</html>", remainingWrongGuesses, guessedLetters.toString(), score);
     }
 
     public int getRemainingWrongGuesses() {
@@ -103,6 +106,10 @@ public class HangmanGame {
 
     public int getRemainingLetters() {
         return remainingLetters;
+    }
+
+    public String getWord() {
+        return Objects.requireNonNullElse(word, "Error: word is null");
     }
 
     public int getScore() {
@@ -149,52 +156,48 @@ public class HangmanGame {
     }
 
     public static void main(String[] args) {
-        String dictionaryName = "./HangmanFunctional/RandomWords.txt";
-        String scoreFile = "./HangmanFunctional/Scores.txt";
+        new HangmanGameGUI(); // TODO game gui created start point
 
-        System.out.println(Score.readScores(scoreFile));
+//        boolean playing = true;
+//        Scanner scanner = new Scanner(System.in);
+//        System.out.println("Please enter your name:");
+//
+//        try {
+//            game = new HangmanGame(scanner.nextLine(), scoreFile);
+//            game.newGame(dictionaryName);
+//        } catch (IOException e) {
+//            return;
+//        }
 
-        boolean playing = true;
-        HangmanGame hangmanGame;
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Please enter your name:");
-
-        try {
-            hangmanGame = new HangmanGame(scanner.nextLine(), scoreFile);
-            hangmanGame.newGame(dictionaryName);
-        } catch (IOException e) {
-            return;
-        }
-
-        while(playing) {
-            hangmanGame.printHangman();
-            hangmanGame.printGuesses();
-            while (true) {
-                String input = scanner.nextLine();
-                if (input.length() != 1) {
-                    System.out.println("Invalid input. Try again.");
-                    continue;
-                }
-                hangmanGame.guessLetter(Character.toLowerCase(input.charAt(0)));
-                hangmanGame.printHangman();
-                hangmanGame.printGuesses();
-                if (hangmanGame.getRemainingLetters() == 0) {
-                    System.out.println("Congratulations!!! You won!!!");
-                    hangmanGame.setScore(hangmanGame.getScore() + 1);
-                    try {
-                        hangmanGame.newGame(dictionaryName);
-                    } catch (IOException e) {
-                        return;
-                    }
-                    break;
-                } else if (hangmanGame.getRemainingWrongGuesses() == 0) {
-                    System.out.println("Out of guesses. You lost.");
-                    hangmanGame.recordScore();
-                    playing = false;
-                    break;
-                }
-            }
-        }
-        System.out.printf("\nCurrent High Score: %s", Score.readScores(scoreFile).stream().max((score1, score2) -> score1.getScore() > score2.getScore() ? 1 : -1).get());
+//        while(playing) {
+//            game.printHangman();
+//            game.printGuesses();
+//            while (true) {
+//                String input = scanner.nextLine();
+//                if (input.length() != 1) {
+//                    System.out.println("Invalid input. Try again.");
+//                    continue;
+//                }
+//                game.guessLetter(Character.toLowerCase(input.charAt(0)));
+//                game.printHangman();
+//                game.printGuesses();
+//                if (game.getRemainingLetters() == 0) {
+//                    System.out.println("Congratulations!!! You won!!!");
+//                    game.setScore(game.getScore() + 1);
+//                    try {
+//                        game.newGame(dictionaryName);
+//                    } catch (IOException e) {
+//                        return;
+//                    }
+//                    break;
+//                } else if (game.getRemainingWrongGuesses() == 0) {
+//                    System.out.println("Out of guesses. You lost.");
+//                    game.recordScore();
+//                    playing = false;
+//                    break;
+//                }
+//            }
+//        }
+//        System.out.printf("\nCurrent High Score: %s", Score.readScores(scoreFile).stream().max((score1, score2) -> score1.getScore() > score2.getScore() ? 1 : -1).get());
     }
 }

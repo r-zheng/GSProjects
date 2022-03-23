@@ -64,6 +64,7 @@ class Score implements Serializable {
             fileInputStream.close();
         }catch (Exception e) {
             System.out.println("Problem reading high scores. If first time, possible that score file is blank.");
+            e.printStackTrace();
             scores = new ArrayList<>();
         }
         return scores;
